@@ -7,6 +7,9 @@ import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 const sceneHost = ref(null)
 const isPlaying = ref(false)
 const selectedModel = ref('')
+const isModelLoading = ref(false)
+const loadProgress = ref(0)
+const loadProgressKnown = ref(false)
 const modelNames = Object.keys(import.meta.glob('./assets/models/*.glb', { eager: true, import: 'default' }))
   .map((path) => path.split('/').pop())
 
@@ -22,6 +25,7 @@ let camera
 let animationId
 let currentModel = null
 let environmentMap = null
+let activeLoadId = 0
 const loader = new GLTFLoader()
 const rgbeLoader = new RGBELoader()
 const clock = new THREE.Clock()
@@ -166,18 +170,33 @@ function clearCurrentModel() {
 }
 
 function loadModel(filename) {
+  const requestId = ++activeLoadId
+
   if (!filename) {
     clearCurrentModel()
+    isModelLoading.value = false
+    loadProgress.value = 0
+    loadProgressKnown.value = false
     return
   }
 
   const path = `./assets/models/${filename}`
   const modelUrl = modelModules[path]
-  if (!modelUrl) return
+  if (!modelUrl) {
+    isModelLoading.value = false
+    loadProgress.value = 0
+    loadProgressKnown.value = false
+    return
+  }
+
+  isModelLoading.value = true
+  loadProgress.value = 0
+  loadProgressKnown.value = false
 
   loader.load(
     modelUrl,
     (gltf) => {
+      if (requestId !== activeLoadId) return
       clearCurrentModel()
       const root = gltf.scene
       root.traverse((child) => {
@@ -189,9 +208,24 @@ function loadModel(filename) {
       placeOnFloor(root)
       currentModel = root
       scene.add(root)
+      loadProgress.value = 100
+      loadProgressKnown.value = true
+      isModelLoading.value = false
     },
-    undefined,
+    (progressEvent) => {
+      if (requestId !== activeLoadId) return
+      if (progressEvent.total > 0) {
+        loadProgressKnown.value = true
+        loadProgress.value = THREE.MathUtils.clamp((progressEvent.loaded / progressEvent.total) * 100, 0, 100)
+      } else {
+        loadProgressKnown.value = false
+      }
+    },
     (error) => {
+      if (requestId !== activeLoadId) return
+      isModelLoading.value = false
+      loadProgressKnown.value = false
+      loadProgress.value = 0
       console.error('Failed to load model:', error)
     }
   )
@@ -356,6 +390,20 @@ onUnmounted(() => {
         <option v-if="modelNames.length === 0" disabled value="">No .glb files found</option>
         <option v-for="name in modelNames" :key="name" :value="name">{{ name }}</option>
       </select>
+
+      <div v-if="isModelLoading" class="loader-box">
+        <div class="loader-text">
+          Loading GLB...
+          <span v-if="loadProgressKnown">{{ Math.round(loadProgress) }}%</span>
+        </div>
+        <div class="loader-track">
+          <div
+            class="loader-fill"
+            :class="{ indeterminate: !loadProgressKnown }"
+            :style="loadProgressKnown ? { width: `${loadProgress}%` } : null"
+          />
+        </div>
+      </div>
 
       <p class="hint">Controls: Arrow keys move, hold Space for jetpack, mouse looks around.</p>
       <p class="hint">Put your models in <code>src/assets/models</code>.</p>

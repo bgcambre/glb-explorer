@@ -87,6 +87,49 @@ select {
   line-height: 1.5;
 }
 
+.loader-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.loader-text {
+  display: flex;
+  justify-content: space-between;
+  color: #3b4a60;
+  font-size: 13px;
+}
+
+.loader-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: #dbe3ef;
+  overflow: hidden;
+}
+
+.loader-fill {
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #2e67ff, #62a2ff);
+  transition: width 0.15s ease-out;
+}
+
+.loader-fill.indeterminate {
+  width: 45%;
+  animation: loader-slide 1s ease-in-out infinite;
+}
+
+@keyframes loader-slide {
+  0% {
+    transform: translateX(-110%);
+  }
+  100% {
+    transform: translateX(250%);
+  }
+}
+
 code {
   font-family: 'SFMono-Regular', Menlo, monospace;
   background: #ecf1f7;
