@@ -3,10 +3,69 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GLB Inspector</title>
+    <title>GLB Explorer</title>
+    <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
-    <div id="app"></div>
+    <canvas id="viewport"></canvas>
+
+    <button id="auto-mode-badge" class="auto-badge" type="button" aria-pressed="true">
+      <span class="auto-dot"></span>
+      Auto
+    </button>
+
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+    </div>
+
+    <aside id="panel" class="panel">
+      <div class="panel-content">
+        <div class="panel-header">
+          <span id="item-index" class="item-index"></span>
+          <span id="item-badge" class="badge badge--expired" hidden>Expired</span>
+        </div>
+        <h1 id="item-title" class="item-title"></h1>
+        <p id="item-author" class="item-author"></p>
+        <p id="item-description" class="item-description"></p>
+        <p id="item-date" class="item-date"></p>
+      </div>
+
+      <div class="panel-footer">
+        <div class="scene-controls">
+          <div class="control-row">
+            <span class="control-label">Environment</span>
+            <div class="hdri-control">
+              <button id="btn-hdri-prev" class="icon-btn" type="button" aria-label="Previous HDRI">&#8592;</button>
+              <span id="hdri-name" class="control-value control-value--name"></span>
+              <button id="btn-hdri-next" class="icon-btn" type="button" aria-label="Next HDRI">&#8594;</button>
+            </div>
+          </div>
+
+          <div class="control-row">
+            <label for="quality-slider" class="control-label">Quality</label>
+            <div class="slider-control">
+              <input id="quality-slider" class="slider" type="range" min="0" max="100" step="1" value="100" />
+              <span id="quality-value" class="control-value">100</span>
+            </div>
+          </div>
+
+          <div class="control-row">
+            <label for="vanished-slider" class="control-label">Vanished</label>
+            <div class="slider-control">
+              <input id="vanished-slider" class="slider" type="range" min="0" max="100" step="1" value="0" />
+              <span id="vanished-value" class="control-value">0</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="hint">Drag to orbit &middot; Scroll to zoom &middot; Arrow keys to inspect</p>
+        <div class="nav-buttons">
+          <button id="btn-prev" class="nav-btn" type="button" aria-label="Previous item">&#8592; Prev</button>
+          <button id="btn-next" class="nav-btn" type="button" aria-label="Next item">Next &#8594;</button>
+        </div>
+      </div>
+    </aside>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

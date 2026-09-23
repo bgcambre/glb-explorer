@@ -1,0 +1,29 @@
+[
+  {
+    "title": "Anaëlle",
+    "author": "Studio Placeholder",
+    "description": "A stylized character study, sculpted and textured for real-time viewing. Lit here with a soft overcast dockside HDRI to keep the focus on form and material.",
+    "date": "2026-08-01",
+    "expiration_date": "2026-12-31",
+    "hdri_path": "/assets/hdri/suburban_garden_1k.exr",
+    "glb_path": "/assets/glb/anaelle.glb"
+  },
+  {
+    "title": "Ducky",
+    "author": "Studio Placeholder",
+    "description": "A classic rubber duck, reimagined as a glossy PBR asset. Included as a lightweight reference model for testing the pipeline end to end.",
+    "date": "2025-11-20",
+    "expiration_date": "2026-01-15",
+    "hdri_path": "/assets/hdri/docklands_02_1k.exr",
+    "glb_path": "/assets/glb/ducky.glb"
+  },
+  {
+    "title": "Tom",
+    "author": "Studio Placeholder",
+    "description": "A character bust exploring stylized shading under neutral studio-style lighting, reusing the dockside environment for consistency across the set.",
+    "date": "2026-09-05",
+    "expiration_date": "2026-11-01",
+    "hdri_path": "/assets/hdri/docklands_02_1k.exr",
+    "glb_path": "/assets/glb/tom.glb"
+  }
+]
