@@ -1,7 +1,28 @@
-export async function loadItems(url = "/data/items.json") {
-  const res = await fetch(url);
+// Vite's `base` rewrites the URLs it can see while building — the module and stylesheet in
+// index.html — but not a path handed to `fetch` at runtime, and not one sitting inside a data
+// file. Both kinds are root-relative by design (CLAUDE.md, "Data model"), which is correct for a
+// site served from its root and wrong for this one, served from /glb-explorer/. So they are
+// resolved against the base here.
+//
+// `import.meta.env.BASE_URL` is "/" in dev and "./" in the build, and the trailing slash is
+// dropped before joining so neither produces a doubled one.
+const asset = (path) =>
+  typeof path === "string" && path.startsWith("/")
+    ? import.meta.env.BASE_URL.replace(/\/$/, "") + path
+    : path;
+
+// Resolved once, as the data enters the app, rather than at each point of use. The paths are also
+// identity: `hdri.js` dedupes the HDRI list by `hdri_path` and `main.js` finds the current one with
+// `indexOf`, so a mix of resolved and raw strings would quietly stop matching.
+export async function loadItems(url = "/data/items-2026.json") {
+  const res = await fetch(asset(url));
   if (!res.ok) throw new Error(`Failed to load ${url}: ${res.status}`);
-  return res.json();
+  const items = await res.json();
+  return items.map((item) => ({
+    ...item,
+    hdri_path: asset(item.hdri_path),
+    glb_path: asset(item.glb_path),
+  }));
 }
 
 export function isExpired(item) {

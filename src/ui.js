@@ -12,8 +12,6 @@ const els = {
   hdriName: document.getElementById("hdri-name"),
   btnHdriPrev: document.getElementById("btn-hdri-prev"),
   btnHdriNext: document.getElementById("btn-hdri-next"),
-  qualitySlider: document.getElementById("quality-slider"),
-  qualityValue: document.getElementById("quality-value"),
   vanishedSlider: document.getElementById("vanished-slider"),
   vanishedValue: document.getElementById("vanished-value"),
   autoBadge: document.getElementById("auto-mode-badge"),
@@ -45,11 +43,6 @@ export function renderHdriName(name) {
   els.hdriName.textContent = name;
 }
 
-export function renderQuality(value) {
-  els.qualitySlider.value = value;
-  els.qualityValue.textContent = String(value);
-}
-
 export function renderVanished(value) {
   els.vanishedSlider.value = value;
   els.vanishedValue.textContent = String(value);
@@ -79,7 +72,6 @@ export function setLoading(isLoading) {
   els.btnNext.disabled = isLoading;
   els.btnHdriPrev.disabled = isLoading || !hdriSwitchable;
   els.btnHdriNext.disabled = isLoading || !hdriSwitchable;
-  els.qualitySlider.disabled = isLoading;
 }
 
 export function onNav({ onPrev, onNext }) {
@@ -87,12 +79,9 @@ export function onNav({ onPrev, onNext }) {
   els.btnNext.addEventListener("click", onNext);
 }
 
-export function onSceneControls({ onHdriPrev, onHdriNext, onQualityChange, onVanishedChange }) {
+export function onSceneControls({ onHdriPrev, onHdriNext, onVanishedChange }) {
   els.btnHdriPrev.addEventListener("click", onHdriPrev);
   els.btnHdriNext.addEventListener("click", onHdriNext);
-  // Mesh decimation is expensive, so it only runs once the user releases the
-  // slider ("change"), not continuously while dragging ("input").
-  els.qualitySlider.addEventListener("change", (e) => onQualityChange(Number(e.target.value)));
   els.vanishedSlider.addEventListener("input", (e) => onVanishedChange(Number(e.target.value)));
 }
 

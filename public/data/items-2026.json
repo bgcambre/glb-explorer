@@ -1,0 +1,74 @@
+[
+  {
+    "title": "Ducky",
+    "author": "Studio Placeholder",
+    "description": "A classic rubber duck, reimagined as a glossy PBR asset. Included as a lightweight reference model for testing the pipeline end to end.",
+    "date": "2025-11-20",
+    "expiration_date": "2026-01-15",
+    "hdri_path": "/assets/hdri/docklands_02_1k.exr",
+    "glb_path": "/assets/glb/ducky.glb"
+  },
+  {
+    "title": "Anaëlle",
+    "author": "Anaëlle Cresp",
+    "description": "",
+    "date": "2025-09-30",
+    "expiration_date": "2025-10-01",
+    "hdri_path": "/assets/hdri/suburban_garden_1k.exr",
+    "glb_path": "/assets/glb/2025/anaelle.glb"
+  },
+  {
+    "title": "Tom",
+    "author": "Tom Geyssens-Baeten",
+    "description": "",
+    "date": "2025-09-30",
+    "expiration_date": "2025-10-01",
+    "hdri_path": "/assets/hdri/docklands_02_1k.exr",
+    "glb_path": "/assets/glb/2025/tom.glb"
+  },
+  {
+    "title": "Izia",
+    "author": "Izia Falourd",
+    "description": "",
+    "date": "2026-10-01",
+    "date": "2027-10-01",
+    "hdri_path": "/assets/hdri/docklands_02_1k.exr",
+    "glb_path": "/assets/glb/2026/falourd_izia_b3_ex2.glb"
+  },
+  {
+    "title": "Foucauld",
+    "author": "Foucauld Janin",
+    "description": "",
+    "date": "2026-10-01",
+    "date": "2027-10-01",
+    "hdri_path": "/assets/hdri/docklands_02_1k.exr",
+    "glb_path": "/assets/glb/2026/janin_Foucauld_B3_exercice2.glb"
+  },
+  {
+    "title": "Lucille",
+    "author": "Lucille Pohier",
+    "description": "",
+    "date": "2026-10-01",
+    "date": "2027-10-01",
+    "hdri_path": "/assets/hdri/docklands_02_1k.exr",
+    "glb_path": "/assets/glb/2026/lucille_pohier_exercice2-02.glb"
+  },
+  {
+    "title": "Daali",
+    "author": "Daali Tchiombiano",
+    "description": "",
+    "date": "2026-10-01",
+    "date": "2027-10-01",
+    "hdri_path": "/assets/hdri/docklands_02_1k.exr",
+    "glb_path": "/assets/glb/2026/TCHIOMBIANO_DAALI_B3_exercice2.glb"
+  },
+  {
+    "title": "Uliana",
+    "author": "Uliana Ziman",
+    "description": "",
+    "date": "2026-10-01",
+    "date": "2027-10-01",
+    "hdri_path": "/assets/hdri/docklands_02_1k.exr",
+    "glb_path": "/assets/glb/2026/ziman_uliana_b3_exercice2-02.glb"
+  }
+]

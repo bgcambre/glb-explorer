@@ -7,7 +7,6 @@ import { getHdriList, hdriDisplayName } from "./hdri.js";
 import {
   renderItem,
   renderHdriName,
-  renderQuality,
   renderVanished,
   renderAutoMode,
   setHdriSwitchable,
@@ -75,22 +74,6 @@ async function main() {
     }
   }
 
-  async function changeQuality(value) {
-    setLoading(true);
-    try {
-      // Let the loading overlay actually paint before the synchronous
-      // decimation pass blocks the main thread.
-      await new Promise(requestAnimationFrame);
-      await new Promise(requestAnimationFrame);
-      viewer.setQuality(value);
-      renderQuality(value);
-    } catch (err) {
-      console.error("Failed to change quality", err);
-    } finally {
-      setLoading(false);
-    }
-  }
-
   function changeVanished(value) {
     viewer.setVanished(value);
     renderVanished(value);
@@ -100,7 +83,6 @@ async function main() {
   onSceneControls({
     onHdriPrev: () => cycleHdri(-1),
     onHdriNext: () => cycleHdri(1),
-    onQualityChange: changeQuality,
     onVanishedChange: changeVanished,
   });
 

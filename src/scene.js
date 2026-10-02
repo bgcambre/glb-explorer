@@ -3,11 +3,9 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { EXRLoader } from "three/examples/jsm/loaders/EXRLoader.js";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { SimplifyModifier } from "three/examples/jsm/modifiers/SimplifyModifier.js";
 
 const PANEL_WIDTH = 380; // px — keep in sync with --panel-width in style.css
 const SIDEBAR_BREAKPOINT = 640; // px — keep in sync with the media query in style.css
-const MAX_QUALITY_REDUCTION = 0.9; // quality=0 removes at most 90% of vertices, never fully destroys the mesh
 
 export function createViewer(canvas) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -33,15 +31,13 @@ export function createViewer(canvas) {
   const hdrLoader = new RGBELoader();
   const pmremGenerator = new THREE.PMREMGenerator(renderer);
   pmremGenerator.compileEquirectangularShader();
-  const simplifyModifier = new SimplifyModifier();
 
   let currentModel = null;
-  let currentMeshes = []; // { mesh, originalGeometry, materials: [{ material, baseRoughness, baseMetalness }] }
+  let currentMeshes = []; // { mesh, materials: [{ material, baseRoughness, baseMetalness }] }
   let currentRadius = 1;
   let currentEnvTexture = null;
   let currentHdriPath = null;
   let currentGrid = null;
-  let qualityValue = 100; // 0-100, persisted across item swaps
   let vanishedValue = 0; // 0-100, set per item by main.js (computed from date/expiration_date)
 
   function setSize() {
@@ -209,9 +205,8 @@ export function createViewer(canvas) {
   function disposeCurrentModel() {
     if (!currentModel) return;
     scene.remove(currentModel);
-    currentMeshes.forEach(({ mesh, originalGeometry, materials }) => {
-      if (mesh.geometry !== originalGeometry) mesh.geometry.dispose();
-      originalGeometry.dispose();
+    currentMeshes.forEach(({ mesh, materials }) => {
+      mesh.geometry.dispose();
       materials.forEach(({ material }) => {
         Object.values(material).forEach((value) => {
           if (value && value.isTexture) value.dispose();
@@ -221,28 +216,6 @@ export function createViewer(canvas) {
     });
     currentModel = null;
     currentMeshes = [];
-  }
-
-  // Re-simplifies from a pristine clone of the original geometry every time
-  // (rather than the currently-displayed one) so quality changes don't
-  // compound decimation error, and so raising the slider back up recovers
-  // detail instead of only ever losing more.
-  function applyQuality(value) {
-    qualityValue = value;
-    const reductionFraction = ((100 - value) / 100) * MAX_QUALITY_REDUCTION;
-
-    currentMeshes.forEach(({ mesh, originalGeometry }) => {
-      if (mesh.geometry !== originalGeometry) mesh.geometry.dispose();
-
-      if (reductionFraction <= 0) {
-        mesh.geometry = originalGeometry;
-        return;
-      }
-
-      const vertexCount = originalGeometry.attributes.position.count;
-      const removeCount = Math.floor(vertexCount * reductionFraction);
-      mesh.geometry = simplifyModifier.modify(originalGeometry, removeCount);
-    });
   }
 
   const WHITE = new THREE.Color(0xffffff);
@@ -286,11 +259,10 @@ export function createViewer(canvas) {
     model.traverse((obj) => {
       if (!obj.isMesh) return;
       const materials = upgradeToPhysical(obj);
-      currentMeshes.push({ mesh: obj, originalGeometry: obj.geometry, materials });
+      currentMeshes.push({ mesh: obj, materials });
     });
 
     frameModel(model);
-    applyQuality(qualityValue);
     applyVanished(vanishedValue);
   }
 
@@ -309,7 +281,6 @@ export function createViewer(canvas) {
     renderer,
     loadItem,
     setHdri: loadEnvironment,
-    setQuality: applyQuality,
     setVanished: applyVanished,
     render,
   };

@@ -36,10 +36,35 @@ An array of items:
 by Vite as static files, unprocessed — paths in `items.json` are root-relative
 (`/assets/...`), matching that.
 
+**Root-relative in the file, resolved against the base when read.** Keep writing
+them with the leading slash: it is how `public/` is laid out, and it reads as the
+one true location of an asset rather than as a guess about where the page is.
+They are joined to `import.meta.env.BASE_URL` by `asset()` in `src/slideshow.js`
+as the data enters the app, because the site is served from a subdirectory (see
+"Deploying"). Resolved once there rather than at each point of use, since these
+paths are also identity — `hdri.js` dedupes by `hdri_path` and `main.js` locates
+the current HDRI with `indexOf`, so a mix of resolved and raw strings would
+quietly stop matching.
+
 Note: `public/assets/hdri/` currently has two `.exr` files, but only one
 (`docklands_02_1k.exr`) is referenced from `items.json`. The HDRI prev/next
 control only has something to switch to once more than one unique `hdri_path`
 appears across items — see "Scene controls" below.
+
+## Deploying
+
+Served from **https://lacambre-3d.be/glb-explorer/**, a subdirectory — the domain
+root is a separate Quartz site. Hence `base: "./"` in `vite.config.js`; with
+Vite's default `base: "/"` the built `index.html` asks for `/assets/index-*.js`,
+which is a 404 on that host, and a 404 is an HTML page — so the browser rejects
+the module on its MIME type ("text/html") rather than on its status. If that
+error ever comes back, it is this, and it names the MIME type rather than the
+missing file.
+
+Upload the **whole** of `dist/` each time, not just the part that changed: the
+asset filenames are content-hashed, so a new `index.html` beside the previous
+assets (or the reverse) points at a hash that is not there — the same 404, and
+the same misleading error.
 
 ## Architecture
 
@@ -49,9 +74,9 @@ composition root that wires the others together.
 - **`src/scene.js`** — owns the three.js side: renderer/camera/`OrbitControls`,
   loading a model (`GLTFLoader`) and its HDRI (`EXRLoader`/`RGBELoader` →
   `PMREMGenerator`), auto-framing the camera to each model's bounding box (models
-  vary wildly in native scale), a floor `GridHelper`, and the three scene
-  controls (quality/vanished/HDRI — see below). Returns a small `{ loadItem,
-  setHdri, setQuality, setVanished, render, camera, controls, renderer }` API;
+  vary wildly in native scale), a floor `GridHelper`, and the two scene
+  controls (vanished/HDRI — see below). Returns a small `{ loadItem,
+  setHdri, setVanished, render, camera, controls, renderer }` API;
   nothing outside this file touches `THREE` directly.
 - **`src/slideshow.js`** — pure data logic: fetches `items.json`, current-index
   state with circular `next()`/`prev()`, `isExpired()`, and
@@ -78,18 +103,11 @@ composition root that wires the others together.
   found across `items.json`. Defaults to the current item's own HDRI; switching
   items resets it back to that item's default. Buttons auto-disable when there's
   only one HDRI available (nothing to switch to).
-- **Quality** (0–100, default 100) — live polygon-count reduction via three.js's
-  `SimplifyModifier`. Persists across item navigation (a viewer-wide
-  preference). Always re-simplifies from a pristine clone of the *original*
-  geometry (never the currently-displayed one), so lowering then raising the
-  slider recovers detail instead of compounding decimation error. Runs on
-  slider release (`change`), not continuously while dragging (`input`) —
-  decimation is synchronous and CPU-heavy enough to jank a live drag.
 - **Vanished** (0–100, default computed per item) — interpolates each mesh's
   material toward fully transmissive glass using `MeshPhysicalMaterial`'s
   `transmission`/`roughness`/`metalness`/`ior`/`thickness`, refracting through
-  whatever HDRI is currently active. Unlike Quality, this is **not** a sticky
-  global value — `computeVanishedDefault(item)` in `slideshow.js` maps `0` at
+  whatever HDRI is currently active. It is **not** a sticky global
+  preference — `computeVanishedDefault(item)` in `slideshow.js` maps `0` at
   `item.date` to `100` at `item.expiration_date` (clamped, recomputed against
   the real clock every time an item is shown), so items visually "vanish" as
   they approach expiry. Dragging the slider overrides that for the current
